@@ -1,5 +1,5 @@
 local vk = require("vk-luvit")
-local vk_api, vk_lp = vk.vk_api, vk.longpoll
+local vk_api, vk_lp = vk.api, vk.longpoll
 
 local function main()
   local token = "Your token or table of tokens"

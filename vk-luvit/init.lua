@@ -1,4 +1,4 @@
 return {
-  vk_api = require("./vk_api"),
+  api = require("./api"),
   longpoll = require("./longpoll")
 }

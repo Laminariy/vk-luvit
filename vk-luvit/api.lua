@@ -1,5 +1,5 @@
 local vk = require("./vk")
-local vk_queue = require("./vk_queue")
+local vk_queue = require("./queue")
 
 local creator_mt = {}
 
