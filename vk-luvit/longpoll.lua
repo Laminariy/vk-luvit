@@ -28,7 +28,7 @@ local LongPoll = Class()
     return http.request("GET", url)
   end
 
-  function LongPoll:run()
+  function LongPoll:coro_run()
     if not self.server then
       self:set_server()
     end
@@ -52,6 +52,10 @@ local LongPoll = Class()
         end
       end
     end
+  end
+
+  function LongPoll:run()
+    coroutine.wrap(self.coro_run)(self)
   end
 
   function LongPoll:stop()
