@@ -1,6 +1,6 @@
-local Class = require("utils.class")
+local Class = require("./utils/class")
 local http = require("simple-http")
-local uri_encode_component = require("utils.uri").encode_component
+local uri_encode_component = require("./utils/uri").encode_component
 
 
 local BASE_VK_URL = "https://api.vk.com/method/"

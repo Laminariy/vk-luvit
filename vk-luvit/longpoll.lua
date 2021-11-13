@@ -1,4 +1,4 @@
-local Class = require("utils.class")
+local Class = require("./utils/class")
 local http = require("simple-http")
 
 
