@@ -41,9 +41,9 @@ local function parse_requests(queue)
 end
 
 
-local M = Class()
+local VKQueue = Class()
 
-  function M:init(vk)
+  function VKQueue:init(vk)
     self.vk = vk
     self.queue = {} -- {{method, params}, {method, params}}
     local interval = type(vk.token)=="table" and 1/(20*#vk.token) or 1/20
@@ -53,7 +53,7 @@ local M = Class()
     set_interval(interval*1000, sender)
   end
 
-  function M:send_queue()
+  function VKQueue:send_queue()
     if #self.queue == 0 then return end
     local queue = {}
     local waiters = {}
@@ -63,7 +63,7 @@ local M = Class()
       table.remove(self.queue, 1)
     end
     local exec_req = parse_requests(queue)
-    local res, err = self.vk:request('execute', {code=exec_req})
+    local res = self.vk:request('execute', {code=exec_req})
     local co_suc, co_err
     if res then
       for i, val in ipairs(res) do
@@ -72,16 +72,14 @@ local M = Class()
           print(debug.traceback(waiters[i], co_err))
         end
       end
-    else
-      print(err)
     end
   end
 
-  function M:request(method, params)
+  function VKQueue:request(method, params)
     local thread = coroutine.running()
     assert(thread, "You must invoke this method inside coroutine!")
     table.insert(self.queue, {{method, params}, thread})
     return coroutine.yield()
   end
 
-return M
+return VKQueue

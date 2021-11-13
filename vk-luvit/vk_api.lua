@@ -14,7 +14,7 @@ local creator_mt = {}
         return tbl
       end
 
-      function api_mt.__call(params)
+      function api_mt.__call(_, params)
         local method = table.concat(api_mt.api_tbl, ".")
         -- snake_case replacement
         method = method:gsub("_(%l)", string.upper)

@@ -34,11 +34,7 @@ local function vk_request(version, access_token, method, params)
   end
   local query = gen_query_string(q_params)
   local url = ("%s%s%s"):format(BASE_VK_URL, method, query)
-  local data, res, err_info = http.request("GET", url) --, _, _, _, _, 25000)
-  if not data then
-    return nil, res
-  end
-  return data
+  return http.request("GET", url) --, _, _, _, _, 25000)
 end
 
 
@@ -70,7 +66,7 @@ local VK = Class()
   function VK:request(method, params)
     local data, err = vk_request(self.version, self:get_token(), method, params)
     err = err or data.error
-    if err then
+    if not data then
       if self.error_handler then
         self.error_handler(err)
         coroutine.yield()
