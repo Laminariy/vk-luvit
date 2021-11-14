@@ -3,10 +3,10 @@ local vk_queue = require("./queue")
 
 local creator_mt = {}
 
-  function creator_mt.__call(_, token, version, queued, error_handler)
+  function creator_mt.__call(_, token, version, queued)
     local api_mt = {
       api_tbl = {},
-      vk = queued and vk_queue(vk(token, version, error_handler)) or vk(token, version, error_handler)
+      vk = queued and vk_queue(vk(token, version)) or vk(token, version)
     }
 
       function api_mt.__index(tbl, key)

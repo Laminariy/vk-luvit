@@ -40,11 +40,10 @@ end
 
 local VK = Class()
 
-  function VK:init(token, version, error_handler)
+  function VK:init(token, version)
     assert(token, 'You must provide token! (string or table of strings)')
     self.version = version or '5.131'
     self.token = token
-    self.error_handler = error_handler
   end
 
   function VK:get_token()
@@ -65,17 +64,15 @@ local VK = Class()
 
   function VK:request(method, params)
     local data, err = vk_request(self.version, self:get_token(), method, params)
-    err = err or data.error
     if not data then
-      if self.error_handler then
-        self.error_handler(err)
-        coroutine.yield()
-      end
-      return nil, err
+      -- TO DO: pretty print error
+      print("Error: " .. err)
+      coroutine.yield()
     end
-    if data.response then
-      return data.response
+    if data.error then
+      return nil, data.error
     end
+    return data.response
   end
 
 return VK

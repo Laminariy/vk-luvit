@@ -63,14 +63,20 @@ local VKQueue = Class()
       table.remove(self.queue, 1)
     end
     local exec_req = parse_requests(queue)
-    local res = self.vk:request('execute', {code=exec_req})
+    local res, err = self.vk:request('execute', {code=exec_req})
+
+    if not res then
+      -- TO DO: pretty print error
+      print(err)
+      return
+    end
+
     local co_suc, co_err
-    if res then
-      for i, val in ipairs(res) do
-        co_suc, co_err = coroutine.resume(waiters[i], val)
-        if not co_suc then
-          print(debug.traceback(waiters[i], co_err))
-        end
+    for i, val in ipairs(res) do
+      co_suc, co_err = coroutine.resume(waiters[i], val)
+      if not co_suc then
+        -- TO DO: pretty print error
+        print(debug.traceback(waiters[i], co_err))
       end
     end
   end

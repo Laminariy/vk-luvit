@@ -12,9 +12,8 @@ end
 
 local LongPoll = Class()
 
-  function LongPoll:init(api, group_id, wait, error_handler)
+  function LongPoll:init(api, group_id, wait)
     self.handlers = {} -- {event_type = {{filter, handler}}, all={...}}
-    self.error_handler = error_handler
     self.running = false
 
     self.api = api
@@ -35,23 +34,33 @@ local LongPoll = Class()
   end
 
   function LongPoll:set_server()
-    local server = self.api.groups.getLongPollServer({group_id=self.group_id})
-    self.server = server.server
-    self.key = server.key
-    self.ts = server.ts
+    local server, err = self.api.groups.getLongPollServer({group_id=self.group_id})
+    if server then
+      self.server = server.server
+      self.key = server.key
+      self.ts = server.ts
+      return true
+    end
+    self.server = nil
+    self.key = nil
+    self.ts = nil
+    return false, err
   end
 
   function LongPoll:get_events()
+    if not self.server then
+      local success, err = self:set_server()
+      if not success then
+        return nil, err
+      end
+    end
+
     local url = "%s?act=a_check&key=%s&ts=%s&wait=%s"
     url = url:format(self.server, self.key, self.ts, self.wait)
     return http.request("GET", url)
   end
 
   function LongPoll:coro_run()
-    if not self.server then
-      self:set_server()
-    end
-
     local events, err
     self.running = true
     while self.running do
@@ -66,9 +75,8 @@ local LongPoll = Class()
           end
         end
       else
-        if self.error_handler then
-          self.error_handler(err)
-        end
+        -- TO DO: pretty print error
+        print("Error: " .. err)
       end
     end
   end
@@ -120,14 +128,25 @@ local LongPoll = Class()
   end
 
   function LongPoll:handle_event(event)
+    local co, success, err
     if self.handlers[event.type] then
       for _, handler in ipairs(self.handlers[event.type]) do
-        coroutine.wrap(handle)(handler[1], handler[2], event)
+        co = coroutine.create(handle)
+        success, err = coroutine.resume(co, handler[1], handler[2], event)
+        if not success then
+          -- TO DO: pretty print error
+          print(err)
+        end
       end
     end
     if self.handlers["all"] then
       for _, handler in ipairs(self.handlers["all"]) do
-        coroutine.wrap(handle)(handler[1], handler[2], event)
+        co = coroutine.create(handle)
+        success, err = coroutine.resume(co, handler[1], handler[2], event)
+        if not success then
+          -- TO DO: pretty print error
+          print(err)
+        end
       end
     end
   end

@@ -1,8 +1,8 @@
   return {
     name = "Laminariy/vk-luvit",
-    version = "0.0.6",
-    description = "VK API wrapper for luvit",
-    tags = { "coro", "http", "vk", "api", "wrapper" },
+    version = "0.0.7",
+    description = "VK Bot API wrapper for luvit",
+    tags = { "coro", "http", "vk", "api", "wrapper", "chat", "bot" },
     license = "MIT",
     author = { name = "Laminariy", email = "dovakin121212@gmail.com" },
     homepage = "https://github.com/Laminariy/vk-luvit",
