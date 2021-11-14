@@ -13,6 +13,17 @@ local LongPoll = Class()
     self.group_id = group_id or api.groups.get_by_id()[1].id
 
     self.wait = wait or 25
+
+    -- router
+    local router_mt = {}
+
+    function router_mt.__index(_, event_type)
+      return function(handler)
+        self:add_handler(event_type, handler)
+      end
+    end
+
+    self.on = setmetatable({}, router_mt)
   end
 
   function LongPoll:set_server()
@@ -90,7 +101,7 @@ local LongPoll = Class()
     end
     if self.handlers["all"] then
       for _, handler in ipairs(self.handlers["all"]) do
-        coroutine.wrap(handler)(ev_type, event_obj)
+        coroutine.wrap(handler)(event)
       end
     end
   end
