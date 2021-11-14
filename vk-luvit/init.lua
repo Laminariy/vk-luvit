@@ -1,4 +1,8 @@
+local api = require("./api")
+local longpoll = require("./longpoll")
 return {
-  api = require("./api"),
-  longpoll = require("./longpoll")
+  api = api,
+  Api = api,
+  longpoll = longpoll,
+  LongPoll = longpoll
 }
