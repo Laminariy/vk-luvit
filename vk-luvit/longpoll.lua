@@ -2,10 +2,18 @@ local Class = require("./utils/class")
 local http = require("simple-http")
 
 
+local function DEFAULT_FILTER(event)
+  return event.object
+end
+
+local function ALL_FILTER(event)
+  return event
+end
+
 local LongPoll = Class()
 
   function LongPoll:init(api, group_id, wait, error_handler)
-    self.handlers = {} -- {event = {handler1, handler2}, all={...}}
+    self.handlers = {} -- {event_type = {{filter, handler}}, all={...}}
     self.error_handler = error_handler
     self.running = false
 
@@ -18,8 +26,8 @@ local LongPoll = Class()
     local router_mt = {}
 
     function router_mt.__index(_, event_type)
-      return function(handler)
-        self:add_handler(event_type, handler)
+      return function(filter, handler)
+        self:add_handler(event_type, filter, handler)
       end
     end
 
@@ -73,35 +81,53 @@ local LongPoll = Class()
     self.running = false
   end
 
-  function LongPoll:add_handler(event, handler)
+  function LongPoll:add_handler(event, filter, handler)
+    if not handler then
+      handler = filter
+      filter = event == "all" and ALL_FILTER or DEFAULT_FILTER
+    end
+
     if not self.handlers[event] then
       self.handlers[event] = {}
     end
-    table.insert(self.handlers[event], handler)
+    table.insert(self.handlers[event], {filter, handler})
   end
 
-  function LongPoll:delete_handler(event, handler)
-    for i, sub_handler in ipairs(self.handlers[event] or {}) do
-      if handler == sub_handler then
-        table.remove(i)
-        break
+  function LongPoll:delete_handler(event, filter, handler)
+    if not handler then
+      handler = filter
+      filter = event == "all" and ALL_FILTER or DEFAULT_FILTER
+    end
+
+    if self.handlers[event] then
+      for i, sub_handler in ipairs(self.handlers[event]) do
+        if sub_handler[1] == filter and sub_handler[2] == handler then
+          table.remove(i)
+          break
+        end
+      end
+      if #(self.handlers[event]) == 0 then
+        self.handlers[event] = nil
       end
     end
-    if #(self.handlers[event] or {}) == 0 then
-      self.handlers[event] = nil
+  end
+
+  local function handle(filter, handler, event)
+    local filter_res = {filter(event)}
+    if next(filter_res) then
+      handler(unpack(filter_res))
     end
   end
 
   function LongPoll:handle_event(event)
-    local ev_type, event_obj = event.type, event.object
-    if self.handlers[ev_type] then
-      for _, handler in ipairs(self.handlers[ev_type]) do
-        coroutine.wrap(handler)(event_obj)
+    if self.handlers[event.type] then
+      for _, handler in ipairs(self.handlers[event.type]) do
+        coroutine.wrap(handle)(handler[1], handler[2], event)
       end
     end
     if self.handlers["all"] then
       for _, handler in ipairs(self.handlers["all"]) do
-        coroutine.wrap(handler)(event)
+        coroutine.wrap(handle)(handler[1], handler[2], event)
       end
     end
   end
