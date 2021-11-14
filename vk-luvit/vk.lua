@@ -1,4 +1,5 @@
 local Class = require("./utils/class")
+local safe_resume = require("./utils/safe_resume")
 local http = require("simple-http")
 local uri_encode_component = require("./utils/uri").encode_component
 
@@ -69,6 +70,7 @@ local VK = Class()
       print("Error: " .. err)
       coroutine.yield()
     end
+    safe_resume() -- hack to safe resume coroutine
     if data.error then
       return nil, data.error
     end

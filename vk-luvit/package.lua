@@ -1,6 +1,6 @@
   return {
     name = "Laminariy/vk-luvit",
-    version = "0.0.7",
+    version = "0.0.8",
     description = "VK Bot API wrapper for luvit",
     tags = { "coro", "http", "vk", "api", "wrapper", "chat", "bot" },
     license = "MIT",
@@ -8,7 +8,8 @@
     homepage = "https://github.com/Laminariy/vk-luvit",
     dependencies = {
       "RiskoZoSlovenska/simple-http",
-      "luvit/secure-socket@1.0.0"
+      "luvit/secure-socket@1.0.0",
+      "creationix/defer-resume"
     },
     files = {
       "**.lua",
