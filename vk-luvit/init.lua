@@ -1,8 +1,9 @@
-local api = require("./api")
-local longpoll = require("./longpoll")
+local API = require("./api")
+local LongPoll = require("./longpoll")
+local Blueprint = require("./blueprint")
 return {
-  api = api,
-  Api = api,
-  longpoll = longpoll,
-  LongPoll = longpoll
+  API = API,
+  LongPoll = LongPoll,
+  Bot = LongPoll,
+  Blueprint = Blueprint
 }

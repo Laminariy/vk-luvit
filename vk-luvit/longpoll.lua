@@ -89,8 +89,9 @@ local LongPoll = Class()
   end
 
   function LongPoll:stop()
+    -- TO DO: longpoll stopping only after next request
     self.running = false
-    self.logger:info("Bot longpoll stoped...")
+    self.logger:info("Bot longpoll stopped...")
   end
 
   function LongPoll:add_handler(event, filter, handler)
