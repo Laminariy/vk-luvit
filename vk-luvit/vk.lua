@@ -1,5 +1,6 @@
 local Class = require("./utils/class")
 local safe_resume = require("./utils/safe_resume")
+local default_logger = require("./utils/logger")
 local http = require("simple-http")
 local uri_encode_component = require("./utils/uri").encode_component
 
@@ -45,6 +46,8 @@ local VK = Class()
     assert(token, 'You must provide token! (string or table of strings)')
     self.version = version or '5.131'
     self.token = token
+
+    self.logger = default_logger()
   end
 
   function VK:get_token()
@@ -66,8 +69,7 @@ local VK = Class()
   function VK:request(method, params)
     local data, err = vk_request(self.version, self:get_token(), method, params)
     if not data then
-      -- TO DO: pretty print error
-      print("Error: " .. err)
+      self.logger:error(err)
       coroutine.yield()
     end
     safe_resume() -- hack to safe resume coroutine

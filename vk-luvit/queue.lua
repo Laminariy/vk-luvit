@@ -45,6 +45,7 @@ local VKQueue = Class()
 
   function VKQueue:init(vk)
     self.vk = vk
+    self.logger = vk.logger
     self.queue = {} -- {{method, params}, {method, params}}
     local interval = type(vk.token)=="table" and 1/(20*#vk.token) or 1/20
     local function sender()
@@ -66,8 +67,7 @@ local VKQueue = Class()
     local res, err = self.vk:request('execute', {code=exec_req})
 
     if not res then
-      -- TO DO: pretty print error
-      print(err)
+      self.logger:error(err)
       return
     end
 
@@ -75,8 +75,7 @@ local VKQueue = Class()
     for i, val in ipairs(res) do
       co_suc, co_err = coroutine.resume(waiters[i], val)
       if not co_suc then
-        -- TO DO: pretty print error
-        print(debug.traceback(waiters[i], co_err))
+        self.logger:error(co_err)
       end
     end
   end

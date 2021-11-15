@@ -13,6 +13,8 @@ end
 local LongPoll = Class()
 
   function LongPoll:init(api, group_id, wait)
+    self.logger = getmetatable(api).vk.logger
+
     self.handlers = {} -- {event_type = {{filter, handler}}, all={...}}
     self.running = false
 
@@ -61,6 +63,7 @@ local LongPoll = Class()
   end
 
   function LongPoll:coro_run()
+    self.logger:info("Bot longpoll started...")
     local events, err
     self.running = true
     while self.running do
@@ -75,8 +78,8 @@ local LongPoll = Class()
           end
         end
       else
-        -- TO DO: pretty print error
-        print("Error: " .. err)
+        -- TO DO: maybe traceback...
+        self.logger:error(err)
       end
     end
   end
@@ -87,6 +90,7 @@ local LongPoll = Class()
 
   function LongPoll:stop()
     self.running = false
+    self.logger:info("Bot longpoll stoped...")
   end
 
   function LongPoll:add_handler(event, filter, handler)
@@ -128,14 +132,14 @@ local LongPoll = Class()
   end
 
   function LongPoll:handle_event(event)
+    self.logger:debug("Handle event: " .. event.type)
     local co, success, err
     if self.handlers[event.type] then
       for _, handler in ipairs(self.handlers[event.type]) do
         co = coroutine.create(handle)
         success, err = coroutine.resume(co, handler[1], handler[2], event)
         if not success then
-          -- TO DO: pretty print error
-          print(err)
+          self.logger:error(err)
         end
       end
     end
@@ -144,8 +148,7 @@ local LongPoll = Class()
         co = coroutine.create(handle)
         success, err = coroutine.resume(co, handler[1], handler[2], event)
         if not success then
-          -- TO DO: pretty print error
-          print(err)
+          self.logger:error(err)
         end
       end
     end
