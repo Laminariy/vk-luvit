@@ -1,5 +1,6 @@
 local Class = require("./utils/class")
 local http = require("simple-http")
+local Msg = require("./msg_funcs")
 
 
 local function DEFAULT_FILTER(event)
@@ -100,6 +101,12 @@ local LongPoll = Class()
       filter = event == "all" and ALL_FILTER or DEFAULT_FILTER
     end
 
+    -- add api and longpoll into handler fenv
+    local fenv = getfenv(handler)
+    fenv["api"] = self.api
+    fenv["bot"] = self
+    fenv["longpoll"] = self
+
     if not self.handlers[event] then
       self.handlers[event] = {}
     end
@@ -134,9 +141,20 @@ local LongPoll = Class()
 
   function LongPoll:handle_event(event)
     self.logger:debug("Handle event: " .. event.type)
-    local co, success, err
+    local co, success, err, fenv, reply_to
+    local peer_id = event.object.peer_id or event.object.from_id
+    if not peer_id and event.object.message then
+      peer_id = event.object.message.peer_id
+      reply_to = event.object.message.id
+    end
     if self.handlers[event.type] then
       for _, handler in ipairs(self.handlers[event.type]) do
+        -- add msg_funcs to fenv
+        if peer_id then
+          fenv = getfenv(handler[2])
+          fenv["msg"] = Msg(self.api, peer_id, reply_to)
+        end
+
         co = coroutine.create(handle)
         success, err = coroutine.resume(co, handler[1], handler[2], event)
         if not success then
@@ -146,6 +164,12 @@ local LongPoll = Class()
     end
     if self.handlers["all"] then
       for _, handler in ipairs(self.handlers["all"]) do
+        -- add msg_funcs to fenv
+        if peer_id then
+          fenv = getfenv(handler[2])
+          fenv["msg"] = Msg(self.api, peer_id, reply_to)
+        end
+
         co = coroutine.create(handle)
         success, err = coroutine.resume(co, handler[1], handler[2], event)
         if not success then

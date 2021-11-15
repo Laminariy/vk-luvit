@@ -1,6 +1,6 @@
   return {
     name = "Laminariy/vk-luvit",
-    version = "0.0.12",
+    version = "0.0.13",
     description = "VK Bot API wrapper for luvit",
     tags = { "coro", "http", "vk", "api", "wrapper", "chat", "bot" },
     license = "MIT",
