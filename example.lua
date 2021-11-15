@@ -1,10 +1,10 @@
 local vk = require("vk-luvit")
 
 
-local api = vk.api("Your token")
-local longpoll = vk.longpoll(api)
+local api = vk.API("Your token")
+local bot = vk.Bot(api)
 
-longpoll.on.message_new(function(msg)
+bot.on.message_new(function(msg)
   local message = msg.message
   api.messages.send({
     peer_id = message.from_id,
@@ -13,4 +13,4 @@ longpoll.on.message_new(function(msg)
   })
 end)
 
-longpoll:run()
+bot:run()
