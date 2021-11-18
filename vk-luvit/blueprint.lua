@@ -47,7 +47,7 @@ local Blueprint = Class()
     if self.handlers[event] then
       for i, sub_handler in ipairs(self.handlers[event]) do
         if sub_handler[1] == filter and sub_handler[2] == handler then
-          table.remove(i)
+          table.remove(self.handlers[event], i)
           break
         end
       end

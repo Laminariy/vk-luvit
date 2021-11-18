@@ -47,7 +47,7 @@ local Msg = Class()
   function Msg:init(api, peer_id, reply_to)
     self.api = api
     self.peer_id = peer_id
-    self.reply_id = reply_to
+    self.reply_to = reply_to
   end
 
   function Msg:send(params)
