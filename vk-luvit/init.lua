@@ -15,6 +15,5 @@ end
 
 return {
   API = API,
-  Bot = require('./bot'),
-  Router = require('./router')
+  Bot = require('./bot')
 }

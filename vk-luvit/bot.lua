@@ -25,10 +25,6 @@ local Bot = Class{}
     self.running = false
   end
 
-  function Bot:connect_router(router)
-    self.router:connect(router)
-  end
-
   function Bot:run()
     logger:info("Bot longpoll started...")
     self.running = true

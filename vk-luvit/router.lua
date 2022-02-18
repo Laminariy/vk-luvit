@@ -38,12 +38,6 @@ local Router = Class{}
     })
   end
 
-  function Router:connect(router)
-    for event_type, handlers in pairs(router.handlers) do
-      self.handlers[event_type] = handlers
-    end
-  end
-
   local function co_handler(filter, handler, event)
     local filter_res = {filter(event)}
     if next(filter_res) then
