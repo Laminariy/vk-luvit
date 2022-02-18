@@ -1,19 +1,21 @@
-local VKRequest = require('./vk_request')
+local VK = require('./vk')
 local Queue = require('./queue')
 local APIWrapper = require('./api_wrapper')
 
 
 local function API(options)
   -- token, version, queued
-  local vk_request = VKRequest(options.token, options.version)
+  local vk = VK(options.token, options.version)
   if options.queued then
-    vk_request = Queue(vk_request)
+    vk = Queue(vk)
   end
-  return APIWrapper(vk_request)
+  return APIWrapper(vk)
 end
 
 
 return {
+  VK = VK,
   API = API,
-  Bot = require('./bot')
+  Bot = require('./bot'),
+  Keyboard = require('./keyboard')
 }

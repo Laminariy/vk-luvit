@@ -7,12 +7,12 @@ local set_interval = require('timer').setInterval
 local Queue = Class()
 
   --- Create Queue object
-  -- @param vk (VKRequest) - vk request object
+  -- @param vk (table) - vk object
   -- @return Queue object
   function Queue:init(vk)
     self.vk = vk
     self.queue = {} -- {{method, params}, {method, params}}
-    local interval = 1/(20*vk.token:count())
+    local interval = 1/(20 * #vk.token)
     set_interval(interval*1000, function()
       coroutine.wrap(self.send_queue)(self)
     end)

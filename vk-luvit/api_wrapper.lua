@@ -1,5 +1,5 @@
 --- Create API wrapper object
--- @param vk (VKRequest) - vk request object
+-- @param vk (table) - vk object
 -- @return API wrapper object
 return function(vk)
   local method_tbl = {}

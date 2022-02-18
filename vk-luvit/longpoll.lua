@@ -6,7 +6,7 @@ local http = require('simple-http')
 local LongPoll = Class{}
 
   --- Create LongPoll object
-  -- @param vk (VKRequest) - vk request object
+  -- @param vk (table) - vk object
   -- @param group_id (number|nil)
   -- @param wait (number)
   function LongPoll:init(vk, group_id, wait)

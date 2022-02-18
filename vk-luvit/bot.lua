@@ -1,5 +1,5 @@
 local Class = require('./utils/class')
-local VKRequest = require('./vk_request')
+local VK = require('./vk')
 local Queue = require('./queue')
 local APIWrapper = require('./api_wrapper')
 local LongPoll = require('./longpoll')
@@ -13,12 +13,12 @@ local Bot = Class{}
     if type(options) == 'string' or not options.token then
       options = {token = options}
     end
-    local vk_request = VKRequest(options.token, options.version)
+    local vk = VK(options.token, options.version)
     if options.queued then
-      vk_request = Queue(vk_request)
+      vk = Queue(vk)
     end
-    self.api = APIWrapper(vk_request)
-    self.longpoll = LongPoll(vk_request, options.group_id, options.wait)
+    self.api = APIWrapper(vk)
+    self.longpoll = LongPoll(vk, options.group_id, options.wait)
     self.router = Router()
     self.on = self.router.on
 
