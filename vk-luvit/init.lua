@@ -1,14 +1,20 @@
-local API = require("./api")
-local LongPoll = require("./longpoll")
-local Blueprint = require("./blueprint")
-local Keyboard = require("./keyboard")
+local VKRequest = require('./vk_request')
+local Queue = require('./queue')
+local APIWrapper = require('./api_wrapper')
+
+
+local function API(options)
+  -- token, version, queued
+  local vk_request = VKRequest(options.token, options.version)
+  if options.queued then
+    vk_request = Queue(vk_request)
+  end
+  return APIWrapper(vk_request)
+end
+
+
 return {
   API = API,
-  LongPoll = LongPoll,
-  Bot = LongPoll,
-  Blueprint = Blueprint,
-  Keyboard = Keyboard,
-  kb = Keyboard.Keyboard,
-  kb_colors = Keyboard.COLORS,
-  kb_actions = Keyboard.ACTIONS
+  Bot = require('./bot'),
+  Router = require('./router')
 }

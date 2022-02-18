@@ -1,6 +1,8 @@
 local defer = require("defer-resume")
-local log = require("./logger")()
+local log = require("./logger")
 
+
+--- Safe resume coroutine without stopping programm in case of error
 return function()
   local co = coroutine.running()
   defer(coroutine.create(function()

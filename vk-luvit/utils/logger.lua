@@ -74,7 +74,7 @@ end
 --	log-level to the log stream.
 -- @return Table representing the new logger object.
 -------------------------------------------------------------------------------
-return function(append, settings)
+local function create_logger(append, settings)
 	if type(append) ~= "function" then
     append = DEFAULT_APPEND
 	end
@@ -154,3 +154,5 @@ return function(append, settings)
 
 	return logger
 end
+
+return create_logger()
