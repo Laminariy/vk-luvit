@@ -1,11 +1,14 @@
-local vk = require("vk-luvit")
+local Bot = require("vk-luvit").Bot
 
 
-local api = vk.API("Your token")
-local bot = vk.Bot(api)
+local bot = Bot('Your token')
 
 bot.on.message_new(function(event)
-  msg:send("Hello!")
+  bot.api.messages.send({
+    peer_id = event.message.from_id,
+    random_id = 0,
+    message = event.message.text
+  })
 end)
 
 bot:run()

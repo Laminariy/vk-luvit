@@ -1,82 +1,57 @@
-local Class = require("./utils/class")
-local safe_resume = require("./utils/safe_resume")
-local default_logger = require("./utils/logger")
-local http = require("simple-http")
-local uri_encode_component = require("./utils/uri").encode_component
+local TokenGenerator = require('./utils/token_generator')
+local logger = require('./utils/logger')
+local safe_resume = require('./utils/safe_resume')
+local stringify_query = require('./utils/stringify_query')
+local http = require('simple-http')
 
 
-local BASE_VK_URL = "https://api.vk.com/method/"
+local BASE_VK_URL = 'https://api.vk.com/method/'
+--- Make vk request
+-- @param vk (table) vk object
+-- @param method (string) vk method to execute
+-- @param params (table|nil) table of method args
+-- @return data (table|nil) result or nil if error
+-- @return error(nil|table) nil or error
+local function request(vk, method, params)
+  assert(type(method) == 'string', 'You must provide method name (string)')
 
-
-local function gen_query_string(query_params)
-  -- query = {name=val, name=val}
-  local query_string = ""
-  if next(query_params) then
-    for query_key,query_value in pairs(query_params) do
-      if type(query_value) == "table" then
-        for _,v in ipairs(query_value) do
-          query_string = ("%s%s%s=%s"):format(query_string, (#query_string == 0 and "?" or "&"), query_key, uri_encode_component(tostring(v)))
-        end
-      else
-        query_string = ("%s%s%s=%s"):format(query_string, (#query_string == 0 and "?" or "&"), query_key, uri_encode_component(tostring(query_value)))
-      end
-    end
-  end
-  return query_string
-end
-
-local function vk_request(version, access_token, method, params)
   params = params or {}
-  local q_params = {
-    v = version,
-    access_token = access_token
+  local query = {
+    v = vk.version,
+    access_token = vk.token:get()
   }
-  for k, v in pairs(params) do
-    q_params[k] = v
+  for key, val in pairs(params) do
+    query[key] = val
   end
-  local query = gen_query_string(q_params)
-  local url = ("%s%s%s"):format(BASE_VK_URL, method, query)
-  return http.request("GET", url) --, _, _, _, _, 25000)
+  query = stringify_query(query)
+  local url = ('%s%s%s'):format(BASE_VK_URL, method, query)
+
+  local data, err = http.request('GET', url)
+  if not data then
+    logger:error(err)
+    coroutine.yield()
+  end
+  safe_resume() -- hack to safe resume coroutine
+  if data.error then
+    return nil, data.error
+  end
+  return data.response
 end
 
 
-local VK = Class()
+local vk_mt = {
+  __call = request,
+  __index = {request = request}
+}
 
-  function VK:init(token, version)
-    assert(token, 'You must provide token! (string or table of strings)')
-    self.version = version or '5.131'
-    self.token = token
-
-    self.logger = default_logger()
-  end
-
-  function VK:get_token()
-    if type(self.token) == 'table' then
-      if not self.token_counter then
-        self.token_counter = 1
-      end
-      local token = self.token[self.token_counter]
-      self.token_counter = self.token_counter + 1
-      if self.token_counter > #self.token then
-        self.token_counter = 1
-      end
-      return token
-    else
-      return self.token
-    end
-  end
-
-  function VK:request(method, params)
-    local data, err = vk_request(self.version, self:get_token(), method, params)
-    if not data then
-      self.logger:error(err)
-      coroutine.yield()
-    end
-    safe_resume() -- hack to safe resume coroutine
-    if data.error then
-      return nil, data.error
-    end
-    return data.response
-  end
-
-return VK
+--- Create VK object
+-- @param token (string|table) token or list of tokens
+-- @param version (string|nil) api version
+-- @return VK object
+return function(token, version)
+  local vk = {
+    token = TokenGenerator(token),
+    version = version or '5.131'
+  }
+  return setmetatable(vk, vk_mt)
+end
