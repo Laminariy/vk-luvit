@@ -40,7 +40,7 @@ local Router = Class{}
 
   local function co_handler(filter, handler, event)
     local filter_res = {filter(event)}
-    if next(filter_res) then
+    if next(filter_res) ~= nil then
       handler(unpack(filter_res))
     end
   end

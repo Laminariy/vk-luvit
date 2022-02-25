@@ -4,7 +4,9 @@ local APIWrapper = require('./api_wrapper')
 
 
 local function API(options)
-  -- token, version, queued
+  if type(options) == 'string' or not options.token then
+    options = {token = options}
+  end
   local vk = VK(options.token, options.version)
   if options.queued then
     vk = Queue(vk)
@@ -13,9 +15,14 @@ local function API(options)
 end
 
 
+-- TO DO: access to logger settings
 return {
   VK = VK,
+  Queue = Queue,
+  APIWrapper = APIWrapper,
   API = API,
+  Router = require('./router'),
+  LongPoll = require('./longpoll'),
   Bot = require('./bot'),
   Keyboard = require('./keyboard')
 }
