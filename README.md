@@ -91,7 +91,7 @@ bot:run()
 **Пример**
 
 ```lua
-  local API = require('vk-luvit')
+  local API = require('vk-luvit').API
 
   local api = API('Your token')
   -- camelCase
