@@ -22,7 +22,7 @@ local keyboard_mt = {
       keyboard.buttons = {}
     end,
     get = function(keyboard)
-      return stringify(keyboard)
+      return string.format('%q', stringify(keyboard))
     end
   }
 }
