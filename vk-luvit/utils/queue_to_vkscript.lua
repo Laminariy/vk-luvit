@@ -1,3 +1,9 @@
+local escapecodes = {
+  ["\""] = "\\\"", ["\\"] = "\\\\", ["\b"] = "\\b", ["\f"] = "\\f",
+  ["\n"] = "\\n",  ["\r"] = "\\r",  ["\t"] = "\\t"
+}
+
+
 --- Parse queue table to VKScript
 -- @param queue (table) - queue table (25 or less elements)
 -- @return vkscript (string) - correct VKScript
@@ -17,7 +23,10 @@ return function(queue)
     for param_name, param_val in pairs(params or {}) do
       tmp_param_str = string.gsub(param_str, "{PARAM_NAME}", string.format("%q", param_name))
       if type(param_val) == "string" then
-        tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format("%q", param_val))
+        for key, value in pairs(escapecodes) do
+          param_val = string.gsub(param_val, key, value)
+        end
+        tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format('"%s"', param_val))
       else
         tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", param_val)
       end
