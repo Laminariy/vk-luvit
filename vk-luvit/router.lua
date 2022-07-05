@@ -46,7 +46,7 @@ local Router = Class{}
   end
 
   function Router:handle_event(event)
-    logger:debug("Handle event: " .. event.type)
+    logger:trace("Handle event: " .. event.type)
     local co, success, err
     if self.handlers[event.type] then
       for _, handler in ipairs(self.handlers[event.type]) do

@@ -16,13 +16,11 @@ return function(queue)
     -- params
     for param_name, param_val in pairs(params or {}) do
       tmp_param_str = string.gsub(param_str, "{PARAM_NAME}", string.format('"%s"', param_name))
-      if type(param_val) == "string" then
-        if param_val:find('\"') == 1 and param_val:find('\"', #param_val) == #param_val then
-          tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", param_val)
-        else
-          param_val = param_val:gsub('\n', '\\n')
-          tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format('"%s"', param_val))
-        end
+      if param_name == "keyboard" then
+        tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format('%q', param_val))
+      elseif type(param_val) == "string" then
+        param_val = param_val:gsub('\n', '\\n')
+        tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format('"%s"', param_val))
       else
         tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", param_val)
       end
