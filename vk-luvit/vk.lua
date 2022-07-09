@@ -1,7 +1,7 @@
 local TokenGenerator = require('./utils/token_generator')
 local logger = require('./utils/logger')
 local safe_resume = require('./utils/safe_resume')
-local stringify_query = require('./utils/stringify_query')
+local stringify_query = require('querystring').stringify
 local http = require('simple-http')
 
 
@@ -24,7 +24,7 @@ local function request(vk, method, params)
     query[key] = val
   end
   query = stringify_query(query)
-  local url = ('%s%s%s'):format(BASE_VK_URL, method, query)
+  local url = ('%s%s?%s'):format(BASE_VK_URL, method, query)
 
   local data, err = http.request('GET', url)
   if not data then

@@ -1,10 +1,10 @@
-local Class = require('./utils/class')
 local logger = require('./utils/logger')
 local queue_to_vkscript = require('./utils/queue_to_vkscript')
 local set_interval = require('timer').setInterval
 
 
-local Queue = Class()
+local Queue = {}
+  Queue.__index = Queue
 
   --- Create Queue object
   -- @param vk (table) - vk object
@@ -54,4 +54,8 @@ local Queue = Class()
     return coroutine.yield()
   end
 
-return Queue
+return setmetatable(Queue, {__call = function(cls, ...)
+  local o = setmetatable({}, cls)
+  o:init(...)
+  return o
+end})

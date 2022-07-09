@@ -1,9 +1,9 @@
-local Class = require('./utils/class')
 local logger = require('./utils/logger')
 local http = require('simple-http')
 
 
-local LongPoll = Class{}
+local LongPoll = {}
+  LongPoll.__index = LongPoll
 
   --- Create LongPoll object
   -- @param vk (table) - vk object
@@ -57,4 +57,8 @@ local LongPoll = Class{}
     return event.updates
   end
 
-return LongPoll
+return setmetatable(LongPoll, {__call = function(cls, ...)
+  local o = setmetatable({}, cls)
+  o:init(...)
+  return o
+end})

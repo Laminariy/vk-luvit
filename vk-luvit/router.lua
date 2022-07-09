@@ -1,4 +1,3 @@
-local Class = require('./utils/class')
 local logger = require('./utils/logger')
 
 
@@ -11,7 +10,8 @@ local function ALL_FILTER(event)
 end
 
 
-local Router = Class{}
+local Router = {}
+  Router.__index = Router
 
   function Router:init()
     self.handlers = {} -- {event_type={{filter=fn, handler=fn}}}
@@ -68,4 +68,8 @@ local Router = Class{}
     end
   end
 
-return Router
+return setmetatable(Router, {__call = function(cls, ...)
+  local o = setmetatable({}, cls)
+  o:init(...)
+  return o
+end})

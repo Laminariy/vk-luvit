@@ -1,4 +1,3 @@
-local Class = require('./utils/class')
 local VK = require('./vk')
 local Queue = require('./queue')
 local APIWrapper = require('./api_wrapper')
@@ -7,7 +6,8 @@ local Router = require('./router')
 local logger = require('./utils/logger')
 
 
-local Bot = Class{}
+local Bot = {}
+  Bot.__index = Bot
 
   function Bot:init(options)
     if type(options) == 'string' or not options.token then
@@ -43,4 +43,8 @@ local Bot = Class{}
     logger:info("Bot longpoll stopped...")
   end
 
-return Bot
+return setmetatable(Bot, {__call = function(cls, ...)
+  local o = setmetatable({}, cls)
+  o:init(...)
+  return o
+end})
