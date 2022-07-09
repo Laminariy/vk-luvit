@@ -19,8 +19,8 @@ return function(queue)
       if param_name == "keyboard" then
         tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format('%q', param_val))
       elseif type(param_val) == "string" then
-        param_val = param_val:gsub('\n', '\\n')
-        tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", string.format('"%s"', param_val))
+        param_val = string.format('%q', param_val):gsub('\\\n', '\\n')
+        tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", param_val)
       else
         tmp_param_str = string.gsub(tmp_param_str, "{PARAM_VAL}", param_val)
       end
