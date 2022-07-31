@@ -15,7 +15,6 @@ local function API(options)
 end
 
 
--- TO DO: access to logger settings
 return {
   VK = VK,
   Queue = Queue,
@@ -24,5 +23,6 @@ return {
   Router = require('./router'),
   LongPoll = require('./longpoll'),
   Bot = require('./bot'),
-  Keyboard = require('./keyboard')
+  Keyboard = require('./keyboard'),
+  logger = require('./utils/logger')
 }
